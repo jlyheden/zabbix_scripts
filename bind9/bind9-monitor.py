@@ -4,14 +4,19 @@ Created on Aug 16, 2011
 
 Populate value_mapper with all the Sections/Items that is desired to monitor.
 By design it seems like Bind only displays the monitored parameters that carries
-non-null values, so this needs to be added after a while that the Bind server
-has run.
+non-null values, so this needs to be updated a while after the Bind server
+has been running.
+
+parse_stats() returns a key:value dictionary, together with UNAME it's easy to construct an
+output suitable for zabbix_sender
 
 @author: johan
 '''
 
+import os
 import re
 
+UNAME=os.uname()[1] # OR SET THIS MANUALLY
 STATS="named.stats.txt"
 
 value_mapper = {'Incoming Requests': { 'QUERY': 'incoming_req'},
@@ -66,7 +71,7 @@ def parse_stats(rl):
             section = re.sub('\+','',line).lstrip(' ').rstrip(' ')
         elif line.startswith(' ') and not section is None:
             item_row_array = re.sub('^\s+','',line).split(' ')
-            item_name = "_".join(item_row_array[1:len(item_row_array)])
+            item_name = "_".join(item_row_array[1::])
             item_value = item_row_array[0]
             zabbix_key = get_key_name(section,item_name)
             if not zabbix_key is None:
@@ -75,4 +80,4 @@ def parse_stats(rl):
 
 if __name__ == '__main__':
     rl = get_stats()
-    parse_stats(rl)
+    result = parse_stats(rl)
