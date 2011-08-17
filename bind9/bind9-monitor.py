@@ -10,11 +10,14 @@ has been running.
 parse_stats() returns a key:value dictionary, together with UNAME it's easy to construct an
 output suitable for zabbix_sender
 
+sys.argv[1] could be the path to the Bind statistics file or hard coded in the STATS variable
+
 @author: johan
 '''
 
 import os
 import re
+import sys
 
 UNAME=os.uname()[1] # OR SET THIS MANUALLY
 STATS="named.stats.txt"
@@ -51,7 +54,7 @@ value_mapper = {'Incoming Requests': { 'QUERY': 'incoming_req'},
                                            'TCP/IPv4_connections_accepted': 'socket_ipv4_tcp_accepted'}
                 }
 
-def get_stats(fn=STATS):
+def get_stats(fn):
     f = open(fn,'r')
     rl = f.read().splitlines()
     return rl
@@ -79,5 +82,14 @@ def parse_stats(rl):
     return result
 
 if __name__ == '__main__':
-    rl = get_stats()
+    fn = None
+    try:
+        sys.argv[1]
+    except:
+        fn = STATS
+    else:
+        fn = sys.argv[1]
+    rl = get_stats(fn)
     result = parse_stats(rl)
+    for key in result.keys():
+        print "%s %s %s" % (UNAME,key,result[key]) #PIPE TO ZABBIX SENDER
