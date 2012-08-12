@@ -1,9 +1,14 @@
-Comments
-* Run the haproxy-poller.py in crontab on any node that has access to the HAProxy status page and access to insert data into Zabbix. Path to the configuration file needs to be set in a variable in this script.
-* Configure mappings between backends in HAProxy and hosts in Zabbix in the haproxy-poller.ini file.
-* Backend nodes should have the Template_HAproxy_backend template.
-* Frontend (the nodes running HAproxy) should have the Template_HAproxy_frontend template.
+= HAproxy Zabbix monitor
 
-The constraints in this monitoring setup is that multiple frontends cannot be monitored on the same host (without some tweaking) and a node can only have one backend in HAProxy. Some kind of clever support for this without creating sort of duplicate templates for each additional frontend/backend would be nice.
+Python script that polls the HAproxy status page and inserts the data into Zabbix via zabbix_sender. Mappings between HAproxy backends/servers and hosts in Zabbix needs to be configured in a text file. Currently supported HAproxy versions are 1.3.x and 1.4.x
 
-Also, this is for HAProxy 1.3.x so support for many of the nifty parameters in 1.4.x is not supported. But you can easily extend by adding the items in the output dict in haproxy-poller.py as well as adding the required trapper items in the template.
+= Howto
+
+Import templates into zabbix.
+Assign hosts to the template.
+Create a config file containing mappings between hosts and haproxy backends.
+Add cron job that launches the poller script at desired intervals. The parameters are:
+# haproxy-poller.py path-to-ini http://proxyip:status-port zabbix-server zabbix-server-port
+
+Items to be monitored can be configured via the options dictionary, set to True or False. You also need to make changes in the HAproxy zabbix template.
+
