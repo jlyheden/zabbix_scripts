@@ -2,6 +2,9 @@
 '''
 Created on 1 aug 2011
 
+Add in crontab like this:
+*/1 * * * * zabbix /usr/local/bin/haproxy-poller.py /usr/local/etc/haproxy-poller.ini http://<proxy-ip>:<stats-port> <zabbix-server> <zabbix-port>
+
 @author: Johan
 '''
 
